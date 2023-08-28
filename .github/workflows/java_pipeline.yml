@@ -1,9 +1,8 @@
 name: Spring Boot CI
 
-on:
+on: 
   push:
-    branches:
-      - master
+  pull_request:
 
 jobs:
   build:
