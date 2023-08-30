@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,13 +14,12 @@ public class TaskDTO {
 
     private Long id;
     private String title;
-    private String description;
     private Boolean completed;
+    private Date createdAt = new Date();
 
     public TaskDTO(Task task) {
         this.id = task.getId();
         this.title = task.getTitle();
-        this.description = task.getDescription();
         this.completed = false;
     }
 }
