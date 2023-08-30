@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 public class TaskDTO {
 
     private Long id;
-    private String name;
+    private String title;
     private String description;
     private Boolean completed;
 
     public TaskDTO(Task task) {
         this.id = task.getId();
-        this.name = task.getName();
+        this.title = task.getTitle();
         this.description = task.getDescription();
         this.completed = false;
     }
