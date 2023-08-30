@@ -13,13 +13,13 @@ import java.util.Date;
 public class TaskDTO {
 
     private Long id;
-    private String name;
+    private String title;
     private Boolean completed;
     private Date createdAt = new Date();
 
     public TaskDTO(Task task) {
         this.id = task.getId();
-        this.name = task.getName();
+        this.title = task.getTitle();
         this.completed = false;
     }
 }

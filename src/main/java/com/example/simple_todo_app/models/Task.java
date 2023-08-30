@@ -19,7 +19,7 @@ public class Task {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    private String title;
     private Boolean completed;
 
 }

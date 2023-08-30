@@ -1,5 +1,7 @@
 package com.example.simple_todo_app.services;
 
+import com.example.simple_todo_app.exceptions.MissingDataException;
+import com.example.simple_todo_app.exceptions.OverExtendedLengthException;
 import com.example.simple_todo_app.models.Task;
 import com.example.simple_todo_app.models.dtos.CreateNewTaskDTO;
 import com.example.simple_todo_app.models.dtos.TaskDTO;
@@ -18,15 +20,14 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task createTask(CreateNewTaskDTO taskDTO) {
 
-        if (taskDTO.getName() == null || taskDTO.getName().isEmpty()) {
-            throw new IllegalArgumentException("Task name cannot be empty");
+        if (taskDTO.getTitle() == null || taskDTO.getTitle().isEmpty()) {
+            throw new MissingDataException("Task title");
         }
-
-        if (taskDTO.getName().length() > 50) {
-            throw new IllegalArgumentException("Task name cannot be longer than 50 characters");
+        if (taskDTO.getTitle().length() > 50) {
+            throw new OverExtendedLengthException("Title");
         }
         Task task = Task.builder()
-                .name(taskDTO.getName())
+                .title(taskDTO.getTitle())
                 .completed(false)
                 .build();
         taskRepository.save(task);

@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateNewTaskDTO {
 
-    private String name;
+    private String title;
 
 }
