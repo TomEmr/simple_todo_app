@@ -18,15 +18,15 @@ public class TaskServiceImpl implements TaskService {
         if (taskDTO.getName() == null || taskDTO.getName().isEmpty()) {
             throw new IllegalArgumentException("Task name cannot be empty");
         }
-        if (taskDTO.getDescription() == null || taskDTO.getDescription().isEmpty()) {
-            throw new IllegalArgumentException("Task description cannot be empty");
-        }
+
+        String description = taskDTO.getDescription() != null ? taskDTO.getDescription() : "";
+
         if (taskDTO.getName().length() > 50) {
             throw new IllegalArgumentException("Task name cannot be longer than 50 characters");
         }
         Task task = Task.builder()
                 .name(taskDTO.getName())
-                .description(taskDTO.getDescription())
+                .description(description)
                 .completed(false)
                 .build();
         taskRepository.save(task);
