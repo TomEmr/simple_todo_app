@@ -5,10 +5,7 @@ import com.example.simple_todo_app.models.dtos.TaskDTO;
 import com.example.simple_todo_app.services.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,5 +17,15 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<?> createTask(@RequestBody CreateNewTaskDTO taskDTORequest) {
         return ResponseEntity.ok().body(new TaskDTO(taskService.createTask(taskDTORequest)));
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllTasks(@RequestParam(required = false) String status) {
+        if ("completed".equals(status)) {
+            return ResponseEntity.ok().body(taskService.getAllCompletedTasks());
+        } else if ("active".equals(status)) {
+            return ResponseEntity.ok().body(taskService.getAllActiveTasks());
+        }
+        return ResponseEntity.ok().body(taskService.getAllTasks());
     }
 }
