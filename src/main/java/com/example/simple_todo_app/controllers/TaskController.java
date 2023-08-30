@@ -17,9 +17,8 @@ public class TaskController {
 
     private final TaskService taskService;
 
-    @PostMapping(produces = "application/json", consumes = "application/json")
+    @PostMapping
     public ResponseEntity<?> createTask(@RequestBody CreateNewTaskDTO taskDTORequest) {
-
         return ResponseEntity.ok().body(new TaskDTO(taskService.createTask(taskDTORequest)));
     }
 }
