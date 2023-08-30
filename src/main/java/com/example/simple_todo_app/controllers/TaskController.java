@@ -21,11 +21,6 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<?> getAllTasks(@RequestParam(required = false) String status) {
-        if ("completed".equals(status)) {
-            return ResponseEntity.ok().body(taskService.getAllCompletedTasks());
-        } else if ("active".equals(status)) {
-            return ResponseEntity.ok().body(taskService.getAllActiveTasks());
-        }
-        return ResponseEntity.ok().body(taskService.getAllTasks());
+        return ResponseEntity.ok().body(taskService.getAllTasksByStatus(status));
     }
 }

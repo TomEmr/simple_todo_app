@@ -10,9 +10,6 @@ public interface TaskService {
 
     Task createTask(CreateNewTaskDTO taskDTO);
 
-    List<TaskDTO> getAllTasks();
+    List<TaskDTO> getAllTasksByStatus(String status);
 
-    List<TaskDTO> getAllCompletedTasks();
-
-    List<TaskDTO> getAllActiveTasks();
 }

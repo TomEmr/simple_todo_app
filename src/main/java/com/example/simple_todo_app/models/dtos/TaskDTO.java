@@ -20,6 +20,6 @@ public class TaskDTO {
     public TaskDTO(Task task) {
         this.id = task.getId();
         this.title = task.getTitle();
-        this.completed = false;
+        this.completed = task.getCompleted();
     }
 }

@@ -35,17 +35,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskDTO> getAllTasks() {
-        return taskRepository.findAll().stream().map(TaskDTO::new).toList();
-    }
+    public List<TaskDTO> getAllTasksByStatus(String status) {
+        List<Task> tasks;
 
-    @Override
-    public List<TaskDTO> getAllCompletedTasks() {
-        return taskRepository.findAllByCompletedTrue().stream().map(TaskDTO::new).toList();
-    }
+        if ("completed".equals(status)) {
+            tasks = taskRepository.findAllByCompletedTrue();
+        } else if ("active".equals(status)) {
+            tasks = taskRepository.findAllByCompletedFalse();
+        } else {
+            tasks = taskRepository.findAll();
+        }
 
-    @Override
-    public List<TaskDTO> getAllActiveTasks() {
-        return taskRepository.findAllByCompletedFalse().stream().map(TaskDTO::new).toList();
+        return tasks.stream().map(TaskDTO::new).toList();
     }
 }
