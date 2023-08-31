@@ -14,7 +14,7 @@ public interface TaskService {
 
     void deleteAllCompletedTasks();
 
-    void deleteById(Long id);
+    Task deleteById(Long id);
 
     Task updateTitleById(Long id, String newTitle);
 
