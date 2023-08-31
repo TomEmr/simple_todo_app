@@ -8,6 +8,7 @@ import com.example.simple_todo_app.models.dtos.TaskDTO;
 import com.example.simple_todo_app.repositories.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -47,5 +48,11 @@ public class TaskServiceImpl implements TaskService {
         }
 
         return tasks.stream().map(TaskDTO::new).toList();
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllCompletedTasks() {
+        taskRepository.deleteAllByCompletedTrue();
     }
 }

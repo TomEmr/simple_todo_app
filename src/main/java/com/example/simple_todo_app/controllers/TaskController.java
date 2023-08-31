@@ -23,4 +23,10 @@ public class TaskController {
     public ResponseEntity<?> getAllTasks(@RequestParam(required = false) String status) {
         return ResponseEntity.ok().body(taskService.getAllTasksByStatus(status));
     }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteAllCompletedTasks() {
+        taskService.deleteAllCompletedTasks();
+        return ResponseEntity.ok().build();
+    }
 }
