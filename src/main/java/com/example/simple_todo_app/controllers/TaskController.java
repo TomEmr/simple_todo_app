@@ -33,8 +33,7 @@ public class TaskController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTaskById(@PathVariable Long id) {
-        taskService.deleteById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(new TaskDTO(taskService.deleteById(id)));
     }
 
     @PatchMapping("/{id}/title")
