@@ -1,6 +1,7 @@
 package com.example.simple_todo_app.services;
 
 import com.example.simple_todo_app.exceptions.MissingDataException;
+import com.example.simple_todo_app.exceptions.NotFoundException;
 import com.example.simple_todo_app.exceptions.OverExtendedLengthException;
 import com.example.simple_todo_app.models.Task;
 import com.example.simple_todo_app.models.dtos.CreateNewTaskDTO;
@@ -61,7 +62,7 @@ public class TaskServiceImpl implements TaskService {
     public void deleteById(Long id) {
         Optional<Task> task = taskRepository.findById(id);
         if (task.isEmpty()) {
-            throw new MissingDataException("Task with id " + id);
+            throw new NotFoundException("Task with id " + id);
         }
         taskRepository.deleteById(id);
     }
@@ -70,7 +71,7 @@ public class TaskServiceImpl implements TaskService {
     public Task updateTitleById(Long id, String newTitle) {
         Optional<Task> task = taskRepository.findById(id);
         if (task.isEmpty()) {
-            throw new MissingDataException("Task with id " + id);
+            throw new NotFoundException("Task with id " + id);
         }
         if (newTitle == null || newTitle.isEmpty()) {
             throw new MissingDataException("Task title");
@@ -88,7 +89,7 @@ public class TaskServiceImpl implements TaskService {
     public Task updateCompletedById(Long id) {
         Optional<Task> task = taskRepository.findById(id);
         if (task.isEmpty()) {
-            throw new MissingDataException("Task with id " + id);
+            throw new NotFoundException("Task with id " + id);
         }
         Task taskToUpdate = task.get();
         taskToUpdate.setCompleted(!taskToUpdate.getCompleted());
