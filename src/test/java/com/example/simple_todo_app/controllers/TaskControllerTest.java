@@ -1,20 +1,15 @@
 package com.example.simple_todo_app.controllers;
 
-import com.example.simple_todo_app.models.Task;
 import com.example.simple_todo_app.models.dtos.CreateNewTaskDTO;
-import com.example.simple_todo_app.repositories.TaskRepository;
-import com.example.simple_todo_app.services.TaskService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -24,19 +19,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
 @ExtendWith(MockitoExtension.class)
 class TaskControllerTest {
-
-    @Mock
-    private TaskService taskService;
-
-    @Mock
-    private TaskRepository taskRepository;
 
     @Autowired
     private MockMvc mockMvc;
