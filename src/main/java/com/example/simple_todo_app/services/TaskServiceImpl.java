@@ -65,4 +65,34 @@ public class TaskServiceImpl implements TaskService {
         }
         taskRepository.deleteById(id);
     }
+
+    @Override
+    public Task updateTitleById(Long id, String newTitle) {
+        Optional<Task> task = taskRepository.findById(id);
+        if (task.isEmpty()) {
+            throw new MissingDataException("Task with id " + id);
+        }
+        if (newTitle == null || newTitle.isEmpty()) {
+            throw new MissingDataException("Task title");
+        }
+        if (newTitle.length() > 50) {
+            throw new OverExtendedLengthException("Title");
+        }
+        Task taskToUpdate = task.get();
+        taskToUpdate.setTitle(newTitle);
+        taskRepository.save(taskToUpdate);
+        return taskToUpdate;
+    }
+
+    @Override
+    public Task updateCompletedById(Long id) {
+        Optional<Task> task = taskRepository.findById(id);
+        if (task.isEmpty()) {
+            throw new MissingDataException("Task with id " + id);
+        }
+        Task taskToUpdate = task.get();
+        taskToUpdate.setCompleted(!taskToUpdate.getCompleted());
+        taskRepository.save(taskToUpdate);
+        return taskToUpdate;
+    }
 }

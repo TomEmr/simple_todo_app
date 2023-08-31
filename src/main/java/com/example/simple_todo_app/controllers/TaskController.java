@@ -2,6 +2,7 @@ package com.example.simple_todo_app.controllers;
 
 import com.example.simple_todo_app.models.dtos.CreateNewTaskDTO;
 import com.example.simple_todo_app.models.dtos.TaskDTO;
+import com.example.simple_todo_app.models.dtos.TaskTitleUpdateDTO;
 import com.example.simple_todo_app.services.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,4 +36,15 @@ public class TaskController {
         taskService.deleteById(id);
         return ResponseEntity.ok().build();
     }
+
+    @PatchMapping("/{id}/title")
+    public ResponseEntity<?> updateTaskTitleById(@PathVariable Long id, @RequestBody TaskTitleUpdateDTO taskTitleUpdateDTO) {
+        return ResponseEntity.ok().body(new TaskDTO(taskService.updateTitleById(id, taskTitleUpdateDTO.getTitle())));
+    }
+
+    @PatchMapping("/{id}/completed")
+    public ResponseEntity<?> updateTaskCompletedById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(new TaskDTO(taskService.updateCompletedById(id)));
+    }
+
 }
