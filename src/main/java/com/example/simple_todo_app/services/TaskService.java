@@ -13,4 +13,6 @@ public interface TaskService {
     List<TaskDTO> getAllTasksByStatus(String status);
 
     void deleteAllCompletedTasks();
+
+    void deleteById(Long id);
 }

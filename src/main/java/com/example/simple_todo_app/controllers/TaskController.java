@@ -29,4 +29,10 @@ public class TaskController {
         taskService.deleteAllCompletedTasks();
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTaskById(@PathVariable Long id) {
+        taskService.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 }

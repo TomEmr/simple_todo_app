@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -54,5 +55,14 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public void deleteAllCompletedTasks() {
         taskRepository.deleteAllByCompletedTrue();
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        Optional<Task> task = taskRepository.findById(id);
+        if (task.isEmpty()) {
+            throw new MissingDataException("Task with id " + id);
+        }
+        taskRepository.deleteById(id);
     }
 }
