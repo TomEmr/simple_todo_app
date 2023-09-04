@@ -28,12 +28,13 @@ public class TaskController {
     @DeleteMapping
     public ResponseEntity<?> deleteAllCompletedTasks() {
         taskService.deleteAllCompletedTasks();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body("All completed tasks deleted.");
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTaskById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(new TaskDTO(taskService.deleteById(id)));
+        taskService.deleteById(id);
+        return ResponseEntity.ok().body("Task with id " + id + " deleted.");
     }
 
     @PatchMapping("/{id}/title")
