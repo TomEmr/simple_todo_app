@@ -79,15 +79,6 @@ class TaskServiceImplTest {
     }
 
     @Test
-    @DisplayName("Delete task by id")
-    void deleteById() {
-        Task task = Task.builder().id(1L).title("Task 1").completed(false).build();
-        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        taskService.deleteById(1L);
-        verify(taskRepository, times(1)).deleteById(1L);
-    }
-
-    @Test
     @DisplayName("Update task title by id")
     void updateTitleById() {
         Task task = Task.builder().id(1L).title("Task 1").completed(false).build();

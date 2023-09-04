@@ -1,6 +1,8 @@
 package com.example.simple_todo_app.controllers;
 
+import com.example.simple_todo_app.models.Task;
 import com.example.simple_todo_app.models.dtos.CreateNewTaskDTO;
+import com.example.simple_todo_app.repositories.TaskRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -28,6 +31,9 @@ class TaskControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     @BeforeEach
     void setUp() {
@@ -68,11 +74,16 @@ class TaskControllerTest {
     @Test
     @DisplayName("Delete request to delete all completed tasks")
     void deleteAllCompletedTasks() throws Exception {
+        Task task = Task.builder()
+                .title("Sample Task")
+                .completed(true)
+                .build();
+        taskRepository.save(task);
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/api/tasks")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
+                .andExpect(content().string("All completed tasks deleted."));
     }
 
 }
