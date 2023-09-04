@@ -55,18 +55,20 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public void deleteAllCompletedTasks() {
+        if (taskRepository.findAllByCompletedTrue().isEmpty()) {
+            throw new NotFoundException("Completed tasks");
+        }
         taskRepository.deleteAllByCompletedTrue();
     }
 
     @Override
-    public Task deleteById(Long id) {
+    public void deleteById(Long id) {
         Optional<Task> task = taskRepository.findById(id);
         if (task.isEmpty()) {
             throw new NotFoundException("Task with id " + id);
         }
         Task taskToDelete = task.get();
-        taskRepository.deleteById(id);
-        return taskToDelete;
+        taskRepository.delete(taskToDelete);
     }
 
     @Override
