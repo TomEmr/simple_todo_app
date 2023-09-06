@@ -1,9 +1,6 @@
 package com.example.simple_todo_app.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,5 +18,8 @@ public class Task {
     private Long id;
     private String title;
     private Boolean completed = false;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }
