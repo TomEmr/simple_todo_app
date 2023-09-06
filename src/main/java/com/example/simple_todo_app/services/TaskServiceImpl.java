@@ -1,5 +1,6 @@
 package com.example.simple_todo_app.services;
 
+import com.example.simple_todo_app.exceptions.EmptyListException;
 import com.example.simple_todo_app.exceptions.MissingDataException;
 import com.example.simple_todo_app.exceptions.NotFoundException;
 import com.example.simple_todo_app.exceptions.OverExtendedLengthException;
@@ -56,7 +57,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public void deleteAllCompletedTasks() {
         if (taskRepository.findAllByCompletedTrue().isEmpty()) {
-            throw new NotFoundException("Completed tasks");
+            throw new EmptyListException("Completed tasks");
         }
         taskRepository.deleteAllByCompletedTrue();
     }
