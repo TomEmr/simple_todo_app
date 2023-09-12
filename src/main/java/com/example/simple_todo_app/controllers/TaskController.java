@@ -3,7 +3,7 @@ package com.example.simple_todo_app.controllers;
 import com.example.simple_todo_app.models.dtos.CreateNewTaskDTO;
 import com.example.simple_todo_app.models.dtos.TaskDTO;
 import com.example.simple_todo_app.models.dtos.TaskTitleUpdateDTO;
-import com.example.simple_todo_app.services.TaskService;
+import com.example.simple_todo_app.services.TaskServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/tasks")
 public class TaskController {
 
-    private final TaskService taskService;
+    private final TaskServiceImpl taskService;
 
     @PostMapping
     public ResponseEntity<?> createTask(@RequestBody CreateNewTaskDTO taskDTORequest) {
