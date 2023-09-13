@@ -50,7 +50,7 @@ public class AuthenticationServiceImpl {
         return RegisterNewUserDTO
                 .builder()
                 .email(user.getEmail())
-                .userName(user.getUsername())
+                .userName(request.getUserName())
                 .build();
     }
 

@@ -17,12 +17,12 @@ public class TaskDTO {
     private Long id;
     private String title;
     private Boolean completed;
-    @Builder.Default
-    private Date createdAt = new Date();
+    private Date createdAt;
 
     public TaskDTO(Task task) {
         this.id = task.getId();
         this.title = task.getTitle();
         this.completed = task.getCompleted();
+        this.createdAt = new Date();
     }
 }
