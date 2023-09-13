@@ -23,6 +23,36 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ex.getHttpStatus()).body(createErrorDTO(ex));
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorDTO> handleNotFoundException(NotFoundException ex) {
+        return ResponseEntity.status(ex.getHttpStatus()).body(createErrorDTO(ex));
+    }
+
+    @ExceptionHandler(EmptyListException.class)
+    public ResponseEntity<ErrorDTO> handleEmptyListException(EmptyListException ex) {
+        return ResponseEntity.status(ex.getHttpStatus()).body(createErrorDTO(ex));
+    }
+
+    @ExceptionHandler(InvalidEmailException.class)
+    public ResponseEntity<ErrorDTO> handleInvalidEmailException(InvalidEmailException ex) {
+        return ResponseEntity.status(ex.getHttpStatus()).body(createErrorDTO(ex));
+    }
+
+    @ExceptionHandler(PasswordTooShortException.class)
+    public ResponseEntity<ErrorDTO> handlePasswordTooShortException(PasswordTooShortException ex) {
+        return ResponseEntity.status(ex.getHttpStatus()).body(createErrorDTO(ex));
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorDTO> handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
+        return ResponseEntity.status(ex.getHttpStatus()).body(createErrorDTO(ex));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorDTO> handleUnauthorizedException(UnauthorizedException ex) {
+        return ResponseEntity.status(ex.getHttpStatus()).body(createErrorDTO(ex));
+    }
+
     private ErrorDTO createErrorDTO(AppException ex) {
         return new ErrorDTO(
                 ex.getHttpStatus(),
