@@ -17,6 +17,7 @@ public class Task {
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
     private String title;
+    @Builder.Default
     private Boolean completed = false;
     @ManyToOne
     @JoinColumn(name = "user_id")
