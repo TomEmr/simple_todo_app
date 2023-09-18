@@ -1,6 +1,7 @@
 package com.example.simple_todo_app.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -19,9 +20,21 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .cors(cors -> {
+                    cors.configurationSource(request -> {
+                        var corsConfig = new org.springframework.web.cors.CorsConfiguration();
+                        corsConfig.addAllowedOrigin(frontendUrl);
+                        corsConfig.addAllowedHeader("*");
+                        corsConfig.addAllowedMethod("*");
+                        return corsConfig;
+                    });
+                })
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
                         request
