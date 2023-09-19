@@ -32,6 +32,7 @@ public class SecurityConfig {
                         corsConfig.addAllowedOrigin(frontendUrl);
                         corsConfig.addAllowedHeader("*");
                         corsConfig.addAllowedMethod("*");
+                        corsConfig.setAllowCredentials(true);
                         return corsConfig;
                     });
                 })
