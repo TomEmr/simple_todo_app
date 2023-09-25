@@ -68,6 +68,7 @@ public class AuthenticationServiceImpl {
         return AuthenticationResponse
                 .builder()
                 .accessToken(token)
+                .userName(user.getName())
                 .build();
     }
 
