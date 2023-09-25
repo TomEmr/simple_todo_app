@@ -39,6 +39,7 @@ public class AuthenticationController {
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse httpResponse) {
         Cookie cookie = new Cookie("accessToken", "");
+        cookie.setHttpOnly(true);
         cookie.setMaxAge(0);
         cookie.setPath("/");
         httpResponse.addCookie(cookie);
