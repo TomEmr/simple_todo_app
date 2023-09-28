@@ -30,7 +30,7 @@ public class AuthenticationController {
         Cookie cookie = new Cookie("accessToken", authenticationResponse.getAccessToken());
         cookie.setHttpOnly(true);
         cookie.setPath("/");
-        cookie.setMaxAge(1000 * 60 * 60 * 24);
+        cookie.setMaxAge(1000 * 60 * 60 * 24 * 10);
         cookie.setSecure(false);
         response.addCookie(cookie);
         return ResponseEntity.ok(authenticationResponse);
