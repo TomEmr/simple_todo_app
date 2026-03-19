@@ -12,38 +12,35 @@ import {
   Alert,
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import useApiCall from '../hooks/useApiCall.ts';
+import { useRegisterMutation } from '../api/authApi';
+import { RegisterFormData } from '../types';
 
-const Register = () => {
-  const [formData, setFormData] = useState({
+const Register: React.FC = () => {
+  const [formData, setFormData] = useState<RegisterFormData>({
     userName: '',
     password: '',
     email: '',
   });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const { makeApiCall } = useApiCall();
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
+  const [register] = useRegisterMutation();
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setError('');
     setSuccess('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    const registerUrl = `${process.env.REACT_APP_API_BASE_URL}/register`;
-    const [data, err] = await makeApiCall({
-      url: registerUrl,
-      method: 'POST',
-      data: formData,
-    });
-    if (data) {
+    try {
+      await register(formData).unwrap();
       setSuccess('Registration successful! You can now log in.');
       setFormData({ userName: '', password: '', email: '' });
-    } else if (err) {
-      setError(err);
+    } catch (err: any) {
+      const errorMsg = err?.data?.message || 'An error occurred';
+      setError(errorMsg);
     }
   };
 

@@ -30,9 +30,11 @@ public class SecurityConfig {
                     cors.configurationSource(request -> {
                         var corsConfig = new org.springframework.web.cors.CorsConfiguration();
                         corsConfig.addAllowedOrigin(frontendUrl);
+                        corsConfig.addAllowedOrigin("http://127.0.0.1:3000");
                         corsConfig.addAllowedHeader("*");
                         corsConfig.addAllowedMethod("*");
                         corsConfig.setAllowCredentials(true);
+                        corsConfig.setMaxAge(3600L);
                         return corsConfig;
                     });
                 })

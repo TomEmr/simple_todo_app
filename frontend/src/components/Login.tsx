@@ -12,36 +12,33 @@ import {
   Alert,
 } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
-import useApiCall from '../hooks/useApiCall.ts';
+import { useLoginMutation } from '../api/authApi';
+import { LoginFormData } from '../types';
 
-const Login = () => {
-  const [formData, setFormData] = useState({
+const Login: React.FC = () => {
+  const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string>('');
   const navigate = useNavigate();
-  const { makeApiCall } = useApiCall();
+  const [login] = useLoginMutation();
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setError('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    const loginUrl = `${process.env.REACT_APP_API_BASE_URL}/login`;
-    const [data, err] = await makeApiCall({
-      url: loginUrl,
-      method: 'POST',
-      data: formData,
-    });
-    if (data) {
-      localStorage.setItem('username', data.userName);
+    try {
+      const response = await login(formData).unwrap();
+      localStorage.setItem('username', response.userName);
       navigate('/main');
-    } else if (err) {
-      setError(err);
+    } catch (err: any) {
+      const errorMsg = err?.data?.message || 'An error occurred';
+      setError(errorMsg);
     }
   };
 

@@ -14,62 +14,53 @@ import EditIcon from '@mui/icons-material/Edit';
 import DoneIcon from '@mui/icons-material/Done';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
-import useApiCall from '../hooks/useApiCall.ts';
+import { useUpdateTodoTitleMutation, useToggleTodoCompletedMutation, useDeleteTodoMutation } from '../api/todoApi';
+import { Todo } from '../types';
 
-const TodoItem = ({ todo, fetchTodos }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [newTitle, setNewTitle] = useState(todo.title);
-  const { makeApiCall } = useApiCall();
+interface TodoItemProps {
+  todo: Todo;
+}
 
-  const handleUpdateTitle = async () => {
+const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [newTitle, setNewTitle] = useState<string>(todo.title);
+  const [updateTodoTitle] = useUpdateTodoTitleMutation();
+  const [toggleTodoCompleted] = useToggleTodoCompletedMutation();
+  const [deleteTodo] = useDeleteTodoMutation();
+
+  const handleUpdateTitle = async (): Promise<void> => {
     if (!newTitle.trim()) return;
-    const updateTitleUrl = `${process.env.REACT_APP_API_TASK_URL}/${todo.id}/title`;
-    const [data, error] = await makeApiCall({
-      url: updateTitleUrl,
-      method: 'PATCH',
-      data: { title: newTitle },
-    });
-    if (data) {
-      await fetchTodos();
+    try {
+      await updateTodoTitle({ id: todo.id, title: newTitle }).unwrap();
       setIsEditing(false);
-    } else if (error) {
-      alert(error);
+    } catch (err: any) {
+      alert(err?.data?.message || 'An error occurred');
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     await handleUpdateTitle();
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = (): void => {
     setNewTitle(todo.title);
     setIsEditing(false);
   };
 
-  const handleDelete = async () => {
-    const deleteUrl = `${process.env.REACT_APP_API_TASK_URL}/${todo.id}`;
-    const [data, error] = await makeApiCall({
-      url: deleteUrl,
-      method: 'DELETE',
-    });
-    if (data) {
-      await fetchTodos();
-    } else if (error) {
-      alert(error);
+  const handleDelete = async (): Promise<void> => {
+    try {
+      await deleteTodo(todo.id).unwrap();
+    } catch (err: any) {
+      alert(err?.data?.message || 'An error occurred');
     }
   };
 
-  const handleComplete = async () => {
-    const completeUrl = `${process.env.REACT_APP_API_TASK_URL}/${todo.id}/completed`;
-    const [data, error] = await makeApiCall({
-      url: completeUrl,
-      method: 'PATCH',
-    });
-    if (data) {
-      await fetchTodos();
-    } else if (error) {
-      alert(error);
+  const handleComplete = async (): Promise<void> => {
+    try {
+      await toggleTodoCompleted(todo.id).unwrap();
+    } catch (err: any) {
+      alert(err?.data?.message || 'An error occurred');
     }
   };
 
@@ -134,7 +125,7 @@ const TodoItem = ({ todo, fetchTodos }) => {
             <TextField
               size="small"
               value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewTitle(e.target.value)}
               autoFocus
               fullWidth
               variant="standard"
@@ -142,7 +133,7 @@ const TodoItem = ({ todo, fetchTodos }) => {
             <Tooltip title="Save">
               <IconButton
                 size="small"
-                onClick={handleSubmit}
+                onClick={() => handleUpdateTitle()}
                 sx={{ color: 'success.main' }}
               >
                 <DoneIcon fontSize="small" />

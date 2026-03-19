@@ -23,19 +23,20 @@ services:
       DB_URL: jdbc:postgresql://db:5432/todo_app
       DB_USER: todo_user
       DB_PASSWORD: todo_pass
-      SECRET_KEY: my-super-secret-key-for-jwt-signing-min-256-bits-long
+      SECRET_KEY: VGhpc0lzQVNlY3JldEtleUZvckp3dFNpZ25pbmdXaXRoMjU2Qml0cyE=
       FRONTEND_URL: http://localhost:3000
     depends_on:
       db:
         condition: service_healthy
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_API_BASE_URL: /api/auth
+        REACT_APP_API_TASK_URL: /api/tasks
     ports:
       - "3000:3000"
-    environment:
-      REACT_APP_API_BASE_URL: http://localhost:8080/api/auth
-      REACT_APP_API_TASK_URL: http://localhost:8080/api/tasks
     depends_on:
       - backend
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   AppBar,
@@ -18,21 +18,26 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import TodoList from './TodoList';
-import useApiCall from '../hooks/useApiCall.ts';
+import { useLogoutMutation } from '../api/authApi';
+import { useGetTodosQuery, useCreateTodoMutation, useDeleteAllCompletedMutation } from '../api/todoApi';
+import { FilterKey, FilterOption } from '../types';
 
-const FILTERS = [
+const FILTERS: FilterOption[] = [
   { key: 'all', label: 'All' },
   { key: 'active', label: 'Active' },
   { key: 'completed', label: 'Completed' },
 ];
 
-const Main = () => {
+const Main: React.FC = () => {
   const navigate = useNavigate();
-  const [todos, setTodos] = useState([]);
-  const [title, setTodo] = useState('');
-  const [filter, setFilter] = useState('all');
-  const [username, setUsername] = useState(localStorage.getItem('username') || 'Guest');
-  const { makeApiCall } = useApiCall();
+  const [title, setTodo] = useState<string>('');
+  const [filter, setFilter] = useState<FilterKey>('all');
+  const [username, setUsername] = useState<string>(localStorage.getItem('username') || 'Guest');
+
+  const { data: todos = [] } = useGetTodosQuery(filter);
+  const [createTodo] = useCreateTodoMutation();
+  const [deleteAllCompleted] = useDeleteAllCompletedMutation();
+  const [logout] = useLogoutMutation();
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
@@ -41,73 +46,36 @@ const Main = () => {
     }
   }, []);
 
-  const fetchTodos = useCallback(
-    async (filter = 'all') => {
-      let todosUrl = `${process.env.REACT_APP_API_TASK_URL}`;
-      if (filter !== 'all') {
-        todosUrl += `?status=${filter}`;
-      }
-      const [data, error] = await makeApiCall({ url: todosUrl, method: 'GET' });
-      if (data) {
-        setTodos(data);
-      } else if (error) {
-        alert(error);
-      }
-    },
-    [makeApiCall]
-  );
-
-  useEffect(() => {
-    (async () => {
-      await fetchTodos(filter);
-    })();
-  }, [filter, fetchTodos]);
-
-  const handleAddTodo = async () => {
+  const handleAddTodo = async (): Promise<void> => {
     if (!title.trim()) return;
-    const todosUrl = `${process.env.REACT_APP_API_TASK_URL}`;
-    const [data, error] = await makeApiCall({
-      url: todosUrl,
-      method: 'POST',
-      data: { title },
-    });
-    if (data) {
-      setTodos([...todos, data]);
+    try {
+      await createTodo({ title }).unwrap();
       setTodo('');
-    } else if (error) {
-      alert(error);
+    } catch (err: any) {
+      alert(err?.data?.message || 'An error occurred');
     }
   };
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     await handleAddTodo();
   };
 
-  const handleDeleteAllCompleted = async () => {
-    const deleteAllCompletedUrl = `${process.env.REACT_APP_API_TASK_URL}`;
-    const [data, error] = await makeApiCall({
-      url: deleteAllCompletedUrl,
-      method: 'DELETE',
-    });
-    if (data) {
-      await fetchTodos(filter);
-    } else if (error) {
-      alert(error);
+  const handleDeleteAllCompleted = async (): Promise<void> => {
+    try {
+      await deleteAllCompleted().unwrap();
+    } catch (err: any) {
+      alert(err?.data?.message || 'An error occurred');
     }
   };
 
-  const handleLogout = async () => {
-    const logoutUrl = `${process.env.REACT_APP_API_BASE_URL}/logout`;
-    const [data, error] = await makeApiCall({
-      url: logoutUrl,
-      method: 'GET',
-    });
-    if (data) {
+  const handleLogout = async (): Promise<void> => {
+    try {
+      await logout().unwrap();
       localStorage.removeItem('username');
       navigate('/');
-    } else if (error) {
-      alert(error);
+    } catch (err: any) {
+      alert(err?.data?.message || 'An error occurred');
     }
   };
 
@@ -145,7 +113,7 @@ const Main = () => {
                 size="small"
                 placeholder="What needs to be done?"
                 value={title}
-                onChange={(e) => setTodo(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTodo(e.target.value)}
               />
               <IconButton
                 type="submit"
@@ -177,7 +145,7 @@ const Main = () => {
           </Stack>
 
           {/* Todo List */}
-          <TodoList todos={todos} fetchTodos={() => fetchTodos(filter)} />
+          <TodoList todos={todos} />
 
           {/* Remove Completed */}
           {todos.some((t) => t.completed) && (

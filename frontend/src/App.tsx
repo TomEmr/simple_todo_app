@@ -7,7 +7,7 @@ import Register from './components/Register';
 import Main from './components/Main';
 import './global.css';
 
-function App() {
+const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -20,6 +20,6 @@ function App() {
       </Router>
     </ThemeProvider>
   );
-}
+};
 
 export default App;
