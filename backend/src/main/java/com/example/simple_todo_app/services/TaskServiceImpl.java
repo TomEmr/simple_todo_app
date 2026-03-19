@@ -5,6 +5,7 @@ import com.example.simple_todo_app.models.Task;
 import com.example.simple_todo_app.models.User;
 import com.example.simple_todo_app.models.dtos.CreateNewTaskDTO;
 import com.example.simple_todo_app.models.dtos.TaskDTO;
+import com.example.simple_todo_app.models.dtos.TaskTitleUpdateDTO;
 import com.example.simple_todo_app.repositories.TaskRepository;
 import com.example.simple_todo_app.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,16 +15,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class TaskServiceImpl {
+public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
 
-    public Task createTask(CreateNewTaskDTO taskDTO) {
+    public TaskDTO createTask(CreateNewTaskDTO taskDTO) {
 
         if (taskDTO.getTitle() == null || taskDTO.getTitle().isEmpty()) {
             throw new MissingDataException("Task title");
@@ -34,30 +34,32 @@ public class TaskServiceImpl {
         }
 
         User user = getAuthenticatedUser();
+        int nextPosition = taskRepository.findMaxPositionByUser(user) + 1;
 
         Task task = Task.builder()
                 .title(taskDTO.getTitle())
                 .user(user)
                 .completed(false)
+                .position(nextPosition)
                 .build();
 
         taskRepository.save(task);
-        return task;
+        return new TaskDTO(task);
     }
 
-    public List<TaskDTO> getAllTasksByStatus(String status) {
+    public List<TaskDTO> getAllTasksByUser(String status) {
         List<Task> tasks;
 
         User user = getAuthenticatedUser();
 
         if ("completed".equals(status)) {
-            tasks = taskRepository.findAllByUserAndCompletedTrue(user);
+            tasks = taskRepository.findByUserAndCompletedOrderByPositionAsc(user, true);
 
         } else if ("active".equals(status)) {
-            tasks = taskRepository.findAllByUserAndCompletedFalse(user);
+            tasks = taskRepository.findByUserAndCompletedOrderByPositionAsc(user, false);
 
         } else {
-            tasks = taskRepository.findAllByUser(user);
+            tasks = taskRepository.findByUserOrderByPositionAsc(user);
         }
 
         return tasks.stream().map(TaskDTO::new).toList();
@@ -74,54 +76,61 @@ public class TaskServiceImpl {
         taskRepository.deleteAllByUserAndCompletedTrue(user);
     }
 
-    public void deleteById(Long id) {
-        Optional<Task> task = taskRepository.findById(id);
-        if (task.isEmpty()) {
-            throw new NotFoundException("Task with id " + id);
-        }
-        Task taskToDelete = task.get();
+    public void deleteTask(Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Task with id " + id));
         User user = getAuthenticatedUser();
-        if (!taskToDelete.getUser().equals(user)) {
+        if (!task.getUser().equals(user)) {
             throw new UnauthorizedException();
         }
 
-        taskRepository.delete(taskToDelete);
+        taskRepository.delete(task);
     }
 
-    public Task updateTitleById(Long id, String newTitle) {
-        Optional<Task> task = taskRepository.findById(id);
-        if (task.isEmpty()) {
-            throw new NotFoundException("Task with id " + id);
-        }
+    public TaskDTO updateTaskTitle(Long id, TaskTitleUpdateDTO taskTitleUpdateDTO) {
+        String newTitle = taskTitleUpdateDTO.getTitle();
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Task with id " + id));
         if (newTitle == null || newTitle.isEmpty()) {
             throw new MissingDataException("Task title");
         }
         if (newTitle.length() > 50) {
             throw new OverExtendedLengthException("Title");
         }
-        Task taskToUpdate = task.get();
         User user = getAuthenticatedUser();
-        if (!taskToUpdate.getUser().equals(user)) {
+        if (!task.getUser().equals(user)) {
             throw new UnauthorizedException();
         }
-        taskToUpdate.setTitle(newTitle);
-        taskRepository.save(taskToUpdate);
-        return taskToUpdate;
+        task.setTitle(newTitle);
+        taskRepository.save(task);
+        return new TaskDTO(task);
     }
 
-    public Task updateCompletedById(Long id) {
-        Optional<Task> task = taskRepository.findById(id);
-        if (task.isEmpty()) {
-            throw new NotFoundException("Task with id " + id);
-        }
-        Task taskToUpdate = task.get();
+    public TaskDTO updateTaskCompleted(Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Task with id " + id));
         User user = getAuthenticatedUser();
-        if (!taskToUpdate.getUser().equals(user)) {
+        if (!task.getUser().equals(user)) {
             throw new UnauthorizedException();
         }
-        taskToUpdate.setCompleted(!taskToUpdate.getCompleted());
-        taskRepository.save(taskToUpdate);
-        return taskToUpdate;
+        task.setCompleted(!task.isCompleted());
+        taskRepository.save(task);
+        return new TaskDTO(task);
+    }
+
+    @Transactional
+    public void reorderTasks(List<Long> taskIds) {
+        User user = getAuthenticatedUser();
+
+        for (int i = 0; i < taskIds.size(); i++) {
+            Task task = taskRepository.findById(taskIds.get(i))
+                    .orElseThrow(() -> new NotFoundException("Task"));
+            if (!task.getUser().equals(user)) {
+                throw new UnauthorizedException();
+            }
+            task.setPosition(i);
+            taskRepository.save(task);
+        }
     }
 
     public User getAuthenticatedUser() {

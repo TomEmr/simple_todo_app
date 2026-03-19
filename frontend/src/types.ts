@@ -26,3 +26,7 @@ export interface FilterOption {
   key: FilterKey;
   label: string;
 }
+
+export interface ReorderRequest {
+  taskIds: number[];
+}

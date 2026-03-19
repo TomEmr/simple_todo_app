@@ -10,8 +10,8 @@ import {
   Link,
   Stack,
   Alert,
+  Fade,
 } from '@mui/material';
-import LoginIcon from '@mui/icons-material/Login';
 import { useLoginMutation } from '../api/authApi';
 import { LoginFormData } from '../types';
 
@@ -20,9 +20,9 @@ const Login: React.FC = () => {
     email: '',
     password: '',
   });
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-  const [login] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
@@ -36,9 +36,9 @@ const Login: React.FC = () => {
       const response = await login(formData).unwrap();
       localStorage.setItem('username', response.userName);
       navigate('/main');
-    } catch (err: any) {
-      const errorMsg = err?.data?.message || 'An error occurred';
-      setError(errorMsg);
+    } catch (err) {
+      const error = err as { data?: { message?: string } };
+      setError(error.data?.message || 'Invalid email or password');
     }
   };
 
@@ -49,64 +49,93 @@ const Login: React.FC = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: 'background.default',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       }}
     >
-      <Container maxWidth="xs">
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Stack spacing={3} alignItems="center">
-            <LoginIcon sx={{ fontSize: 48, color: 'primary.main' }} />
-            <Typography variant="h4" color="primary">
-              Easy To-Do
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Sign in to your account
-            </Typography>
-
-            {error && (
-              <Alert severity="error" sx={{ width: '100%' }}>
-                {error}
-              </Alert>
-            )}
-
-            <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
-              <Stack spacing={2}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-                <TextField
-                  fullWidth
-                  label="Password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-                <Button
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  fullWidth
-                  sx={{ py: 1.5 }}
+      <Fade in timeout={600}>
+        <Container maxWidth="xs">
+          <Paper elevation={0} sx={{ p: 5, boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
+            <Stack spacing={3} alignItems="center">
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 3,
+                    background: 'linear-gradient(135deg, #4F46E5, #7C3AED)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
                 >
-                  Login
-                </Button>
-              </Stack>
-            </Box>
+                  <Typography variant="h6" sx={{ color: 'white', fontWeight: 800, fontSize: '1rem' }}>
+                    STA
+                  </Typography>
+                </Box>
+                <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                  Simple Todo
+                </Typography>
+              </Box>
 
-            <Link component={RouterLink} to="/register" underline="hover">
-              Don't have an account? Register here
-            </Link>
-          </Stack>
-        </Paper>
-      </Container>
+              <Typography variant="body1" color="text.secondary">
+                Welcome back! Sign in to continue.
+              </Typography>
+
+              {error && (
+                <Alert severity="error" sx={{ width: '100%' }}>
+                  {error}
+                </Alert>
+              )}
+
+              <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+                <Stack spacing={2.5}>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                  <TextField
+                    fullWidth
+                    label="Password"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    size="large"
+                    fullWidth
+                    disabled={isLoading}
+                    sx={{
+                      py: 1.5,
+                      background: 'linear-gradient(135deg, #4F46E5, #7C3AED)',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #4338CA, #6D28D9)',
+                      },
+                    }}
+                  >
+                    {isLoading ? 'Signing in...' : 'Sign In'}
+                  </Button>
+                </Stack>
+              </Box>
+
+              <Typography variant="body2" color="text.secondary">
+                Don't have an account?{' '}
+                <Link component={RouterLink} to="/register" underline="hover" sx={{ fontWeight: 600 }}>
+                  Create one
+                </Link>
+              </Typography>
+            </Stack>
+          </Paper>
+        </Container>
+      </Fade>
     </Box>
   );
 };

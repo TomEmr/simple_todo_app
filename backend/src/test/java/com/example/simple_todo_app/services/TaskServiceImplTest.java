@@ -6,6 +6,8 @@ import com.example.simple_todo_app.exceptions.OverExtendedLengthException;
 import com.example.simple_todo_app.models.Task;
 import com.example.simple_todo_app.models.User;
 import com.example.simple_todo_app.models.dtos.CreateNewTaskDTO;
+import com.example.simple_todo_app.models.dtos.TaskDTO;
+import com.example.simple_todo_app.models.dtos.TaskTitleUpdateDTO;
 import com.example.simple_todo_app.repositories.TaskRepository;
 import com.example.simple_todo_app.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,20 +87,20 @@ class TaskServiceImplTest {
     @Test
     @DisplayName("Get all tasks")
     void getAllTasks() {
-        assertEquals(5, taskService.getAllTasksByStatus(null).size());
-        assertEquals(5, taskService.getAllTasksByStatus("").size());
+        assertEquals(5, taskService.getAllTasksByUser(null).size());
+        assertEquals(5, taskService.getAllTasksByUser("").size());
     }
 
     @Test
     @DisplayName("Get all completed tasks")
     void getAllCompletedTasks() {
-        assertEquals(2, taskService.getAllTasksByStatus("completed").size());
+        assertEquals(2, taskService.getAllTasksByUser("completed").size());
     }
 
     @Test
     @DisplayName("Get all active tasks")
     void getAllActiveTasks() {
-        assertEquals(3, taskService.getAllTasksByStatus("active").size());
+        assertEquals(3, taskService.getAllTasksByUser("active").size());
     }
 
     @Test
@@ -114,7 +116,9 @@ class TaskServiceImplTest {
         Task task = Task.builder().id(1L).title("Task 1").user(user).completed(false).build();
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
         when(taskRepository.save(task)).thenReturn(task);
-        assertEquals("Task 2", taskService.updateTitleById(1L, "Task 2").getTitle());
+        TaskTitleUpdateDTO dto = new TaskTitleUpdateDTO();
+        dto.setTitle("Task 2");
+        assertEquals("Task 2", taskService.updateTaskTitle(1L, dto).getTitle());
     }
 
     @Test
@@ -123,7 +127,9 @@ class TaskServiceImplTest {
         Task task = Task.builder().id(1L).title("Task 1").completed(false).build();
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
         when(taskRepository.save(task)).thenReturn(task);
-        assertThrows(MissingDataException.class, () -> taskService.updateTitleById(1L, ""));
+        TaskTitleUpdateDTO dto = new TaskTitleUpdateDTO();
+        dto.setTitle("");
+        assertThrows(MissingDataException.class, () -> taskService.updateTaskTitle(1L, dto));
     }
 
     @Test
@@ -132,14 +138,16 @@ class TaskServiceImplTest {
         Task task = Task.builder().id(1L).title("Task 1").user(user).completed(false).build();
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
         when(taskRepository.save(task)).thenReturn(task);
-        assertEquals(true, taskService.updateCompletedById(1L).getCompleted());
+        assertEquals(true, taskService.updateTaskCompleted(1L).getCompleted());
     }
 
     @Test
     @DisplayName("Task not found exception")
     void taskNotFoundException() {
         when(taskRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> taskService.updateTitleById(1L, "Task 2"));
+        TaskTitleUpdateDTO dto = new TaskTitleUpdateDTO();
+        dto.setTitle("Task 2");
+        assertThrows(NotFoundException.class, () -> taskService.updateTaskTitle(1L, dto));
     }
 
     @Test
@@ -148,7 +156,7 @@ class TaskServiceImplTest {
         CreateNewTaskDTO taskDTO = CreateNewTaskDTO.builder().title("Task 1").build();
         Task taskWithId = Task.builder().id(1L).title("Task 1").completed(false).build();
         when(taskRepository.save(any(Task.class))).thenReturn(taskWithId);
-        Task savedTask = taskService.createTask(taskDTO);
+        TaskDTO savedTask = taskService.createTask(taskDTO);
         assertEquals(taskWithId.getTitle(), savedTask.getTitle());
     }
 

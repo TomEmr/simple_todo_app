@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -17,12 +17,14 @@ public class TaskDTO {
     private Long id;
     private String title;
     private Boolean completed;
-    private Date createdAt;
+    private int position;
+    private LocalDateTime createdAt;
 
     public TaskDTO(Task task) {
         this.id = task.getId();
         this.title = task.getTitle();
-        this.completed = task.getCompleted();
-        this.createdAt = new Date();
+        this.completed = task.isCompleted();
+        this.position = task.getPosition();
+        this.createdAt = task.getCreatedAt();
     }
 }

@@ -22,12 +22,12 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationServiceImpl {
+public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authManager;
-    private final JwtServiceImpl jwtService;
+    private final JwtService jwtService;
 
     public RegisterNewUserDTO register(RegisterRequest request) {
         Optional<User> optionalUser = userRepo.findByEmail(request.getEmail());
@@ -73,20 +73,17 @@ public class AuthenticationServiceImpl {
     }
 
     private void validateRequest(String password, String email) {
+        if (password == null || password.isEmpty()) {
+            throw new MissingDataException("Password");
+        }
+        if (email == null || email.isEmpty()) {
+            throw new MissingDataException("Email");
+        }
         if (password.length() < 5) {
             throw new PasswordTooShortException();
         }
-        if (!email.contains("@") && !email.contains(".")) {
+        if (!email.contains("@") || !email.contains(".")) {
             throw new InvalidEmailException();
-        }
-        if (password.isEmpty() && email.isEmpty()) {
-            throw new MissingDataException("Password and email");
-        }
-        if (password.isEmpty()) {
-            throw new MissingDataException("Password");
-        }
-        if (email.isEmpty()) {
-            throw new MissingDataException("Email");
         }
     }
 }

@@ -11,14 +11,14 @@ export const todoApi = createApi({
   endpoints: (builder) => ({
     getTodos: builder.query<Todo[], FilterKey>({
       query: (filter) => ({
-        url: '/',
+        url: '',
         params: filter !== 'all' ? { status: filter } : undefined,
       }),
       providesTags: ['Todo'],
     }),
     createTodo: builder.mutation<Todo, { title: string }>({
       query: (body) => ({
-        url: '/',
+        url: '',
         method: 'POST',
         body,
       }),
@@ -39,17 +39,28 @@ export const todoApi = createApi({
       }),
       invalidatesTags: ['Todo'],
     }),
-    deleteTodo: builder.mutation<void, number>({
+    deleteTodo: builder.mutation<string, number>({
       query: (id) => ({
         url: `/${id}`,
         method: 'DELETE',
+        responseHandler: 'text',
       }),
       invalidatesTags: ['Todo'],
     }),
-    deleteAllCompleted: builder.mutation<void, void>({
+    deleteAllCompleted: builder.mutation<string, void>({
       query: () => ({
-        url: '/',
+        url: '',
         method: 'DELETE',
+        responseHandler: 'text',
+      }),
+      invalidatesTags: ['Todo'],
+    }),
+    reorderTodos: builder.mutation<string, number[]>({
+      query: (taskIds) => ({
+        url: '/reorder',
+        method: 'PUT',
+        body: taskIds,
+        responseHandler: 'text',
       }),
       invalidatesTags: ['Todo'],
     }),
@@ -63,4 +74,5 @@ export const {
   useToggleTodoCompletedMutation,
   useDeleteTodoMutation,
   useDeleteAllCompletedMutation,
+  useReorderTodosMutation,
 } = todoApi;

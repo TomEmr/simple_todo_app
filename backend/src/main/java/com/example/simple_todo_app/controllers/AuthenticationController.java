@@ -3,7 +3,7 @@ package com.example.simple_todo_app.controllers;
 import com.example.simple_todo_app.models.dtos.AuthenticationResponse;
 import com.example.simple_todo_app.models.dtos.RegisterRequest;
 import com.example.simple_todo_app.models.dtos.LoginRequest;
-import com.example.simple_todo_app.services.AuthenticationServiceImpl;
+import com.example.simple_todo_app.services.AuthenticationService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-    private final AuthenticationServiceImpl authService;
+    private static final int COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24; // 1 day
+
+    private final AuthenticationService authService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
@@ -27,12 +29,12 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         AuthenticationResponse authenticationResponse = authService.login(loginRequest);
-        Cookie cookie = new Cookie("accessToken", authenticationResponse.getAccessToken());
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(1000 * 60 * 60 * 24 * 10);
-        cookie.setSecure(false);
-        response.addCookie(cookie);
+        String cookieValue = String.format(
+                "accessToken=%s; Max-Age=%d; Path=/; HttpOnly; SameSite=Lax",
+                authenticationResponse.getAccessToken(),
+                COOKIE_MAX_AGE_SECONDS
+        );
+        response.addHeader("Set-Cookie", cookieValue);
         return ResponseEntity.ok(authenticationResponse);
     }
 
