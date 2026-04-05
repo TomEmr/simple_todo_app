@@ -1,10 +1,25 @@
-FROM gradle:8.5-jdk17 AS build
-WORKDIR /app
-COPY . .
-RUN gradle bootJar --no-daemon
+FROM node:20-alpine AS builder
 
-FROM eclipse-temurin:17-jre
 WORKDIR /app
-COPY --from=build /app/build/libs/*.jar app.jar
+
+COPY package*.json ./
+COPY prisma ./prisma/
+
+RUN npm ci
+RUN npx prisma generate
+
+COPY . .
+RUN npm run build
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/prisma ./prisma
+
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]

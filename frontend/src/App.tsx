@@ -1,37 +1,59 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { ThemeProvider, CssBaseline } from '@mui/material';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider as MuiThemeProvider, CssBaseline } from '@mui/material';
 import { Toaster } from 'react-hot-toast';
-import theme from './theme';
-import Login from './components/Login';
-import Register from './components/Register';
-import Main from './components/Main';
+import { ThemeProvider, useThemeMode } from './context/ThemeContext';
+import { getTheme } from './theme';
+import AuthPage from './components/auth/AuthPage';
+import AppLayout from './components/layout/AppLayout';
+import TasksPage from './components/tasks/TasksPage';
+import ProfilePage from './components/profile/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import './global.css';
 
-const App: React.FC = () => {
+function ThemedApp() {
+  const { resolvedMode } = useThemeMode();
+  const theme = getTheme(resolvedMode);
+
   return (
-    <ThemeProvider theme={theme}>
+    <MuiThemeProvider theme={theme}>
       <CssBaseline />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<AuthPage />} />
+          <Route
+            path="/app"
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="/app/tasks" replace />} />
+            <Route path="tasks" element={<TasksPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
       <Toaster
         position="bottom-center"
         toastOptions={{
-          duration: 3000,
           style: {
-            borderRadius: '8px',
-            fontFamily: '"Inter", "Roboto", sans-serif',
+            fontFamily: '"Geist", "Inter", sans-serif',
+            borderRadius: '12px',
           },
         }}
       />
-      <Router>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/main" element={<ProtectedRoute><Main /></ProtectedRoute>} />
-        </Routes>
-      </Router>
+    </MuiThemeProvider>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <ThemedApp />
     </ThemeProvider>
   );
-};
+}
 
 export default App;
