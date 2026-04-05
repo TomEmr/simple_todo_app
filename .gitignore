@@ -1,7 +1,21 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
 # IDE
 .idea/
 .vscode/
 *.iml
+*.swp
+*.swo
 
 # OS
 .DS_Store
@@ -9,20 +23,14 @@ Thumbs.db
 
 # Claude
 CLAUDE.md
+.claude/
 
-# Environment
-.env
-.env.local
-.env.*.local
+# Playwright
+.playwright/
 
-# Frontend
-frontend/node_modules/
-frontend/build/
-frontend/.env
+# Auto Claude data directory
+.auto-claude/
 
-# Backend
-backend/build/
-backend/.gradle/
-backend/bin/
-backend/out/
-backend/*.jar
+# Logs
+*.log
+npm-debug.log*

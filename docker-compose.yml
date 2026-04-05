@@ -2,15 +2,15 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: todo_app
-      POSTGRES_USER: todo_user
-      POSTGRES_PASSWORD: todo_pass
+      POSTGRES_DB: taskly
+      POSTGRES_USER: taskly_user
+      POSTGRES_PASSWORD: taskly_pass
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U todo_user -d todo_app"]
+      test: ["CMD-SHELL", "pg_isready -U taskly_user -d taskly"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -20,11 +20,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      DB_URL: jdbc:postgresql://db:5432/todo_app
-      DB_USER: todo_user
-      DB_PASSWORD: todo_pass
-      SECRET_KEY: VGhpc0lzQVNlY3JldEtleUZvckp3dFNpZ25pbmdXaXRoMjU2Qml0cyE=
+      DATABASE_URL: postgresql://taskly_user:taskly_pass@db:5432/taskly
+      JWT_SECRET: VGhpc0lzQVNlY3JldEtleUZvckp3dFNpZ25pbmdXaXRoMjU2Qml0cyE=
       FRONTEND_URL: http://localhost:3000
+      PORT: 8080
     depends_on:
       db:
         condition: service_healthy
@@ -32,9 +31,6 @@ services:
   frontend:
     build:
       context: ./frontend
-      args:
-        REACT_APP_API_BASE_URL: /api/auth
-        REACT_APP_API_TASK_URL: /api/tasks
     ports:
       - "3000:3000"
     depends_on:

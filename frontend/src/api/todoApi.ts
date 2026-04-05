@@ -1,78 +1,88 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Todo, FilterKey } from '../types';
+import type { Task, CreateTaskRequest, UpdateTaskRequest } from '../types';
+
+interface GetTasksParams {
+  status?: string;
+  categoryId?: number;
+  dueDate?: string;
+}
 
 export const todoApi = createApi({
   reducerPath: 'todoApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_API_TASK_URL,
+    baseUrl: '/api/tasks',
     credentials: 'include',
   }),
-  tagTypes: ['Todo'],
+  tagTypes: ['Task', 'Category'],
   endpoints: (builder) => ({
-    getTodos: builder.query<Todo[], FilterKey>({
-      query: (filter) => ({
-        url: '',
-        params: filter !== 'all' ? { status: filter } : undefined,
-      }),
-      providesTags: ['Todo'],
+    getTasks: builder.query<Task[], GetTasksParams | void>({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        if (params?.status) searchParams.set('status', params.status);
+        if (params?.categoryId != null)
+          searchParams.set('categoryId', String(params.categoryId));
+        if (params?.dueDate) searchParams.set('dueDate', params.dueDate);
+
+        const queryString = searchParams.toString();
+        return queryString ? `?${queryString}` : '';
+      },
+      providesTags: ['Task'],
     }),
-    createTodo: builder.mutation<Todo, { title: string }>({
+
+    createTask: builder.mutation<Task, CreateTaskRequest>({
       query: (body) => ({
-        url: '',
+        url: '/',
         method: 'POST',
         body,
       }),
-      invalidatesTags: ['Todo'],
+      invalidatesTags: ['Task', 'Category'],
     }),
-    updateTodoTitle: builder.mutation<Todo, { id: number; title: string }>({
-      query: ({ id, title }) => ({
-        url: `/${id}/title`,
+
+    updateTask: builder.mutation<Task, { id: number } & UpdateTaskRequest>({
+      query: ({ id, ...body }) => ({
+        url: `/${id}`,
         method: 'PATCH',
-        body: { title },
+        body,
       }),
-      invalidatesTags: ['Todo'],
+      invalidatesTags: ['Task', 'Category'],
     }),
-    toggleTodoCompleted: builder.mutation<Todo, number>({
-      query: (id) => ({
-        url: `/${id}/completed`,
-        method: 'PATCH',
-      }),
-      invalidatesTags: ['Todo'],
-    }),
-    deleteTodo: builder.mutation<string, number>({
+
+    deleteTask: builder.mutation<string, number>({
       query: (id) => ({
         url: `/${id}`,
         method: 'DELETE',
         responseHandler: 'text',
       }),
-      invalidatesTags: ['Todo'],
+      invalidatesTags: ['Task', 'Category'],
     }),
+
     deleteAllCompleted: builder.mutation<string, void>({
       query: () => ({
-        url: '',
+        url: '/',
         method: 'DELETE',
         responseHandler: 'text',
       }),
-      invalidatesTags: ['Todo'],
+      invalidatesTags: ['Task', 'Category'],
     }),
-    reorderTodos: builder.mutation<string, number[]>({
-      query: (taskIds) => ({
+
+    reorderTasks: builder.mutation<string, number[]>({
+      query: (body) => ({
         url: '/reorder',
         method: 'PUT',
-        body: taskIds,
+        body,
         responseHandler: 'text',
       }),
-      invalidatesTags: ['Todo'],
+      invalidatesTags: ['Task'],
     }),
   }),
 });
 
 export const {
-  useGetTodosQuery,
-  useCreateTodoMutation,
-  useUpdateTodoTitleMutation,
-  useToggleTodoCompletedMutation,
-  useDeleteTodoMutation,
+  useGetTasksQuery,
+  useLazyGetTasksQuery,
+  useCreateTaskMutation,
+  useUpdateTaskMutation,
+  useDeleteTaskMutation,
   useDeleteAllCompletedMutation,
-  useReorderTodosMutation,
+  useReorderTasksMutation,
 } = todoApi;
